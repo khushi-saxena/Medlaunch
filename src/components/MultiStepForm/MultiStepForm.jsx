@@ -1,107 +1,110 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Step1Personal } from './steps/Step1Personal';
-import { Step2Address } from './steps/Step2Address';
-import { Step3Preferences } from './steps/Step3Preferences';
-import { Step4Review } from './steps/Step4Review';
+import { Step1Organization } from './steps/Step1Organization';
+import { Step2Facility } from './steps/Step2Facility';
+import { Step3Leadership } from './steps/Step3Leadership';
+import { Step4SiteInfo } from './steps/Step4SiteInfo';
+import { Step5Services } from './steps/Step5Services';
+import { Step6Review } from './steps/Step6Review';
 import { Success } from './steps/Success';
 import './MultiStepForm.css';
 
+const STEPS = [
+    "DNV Quote Request",
+    "Facility Details",
+    "Leadership Contacts",
+    "Site Information",
+    "Services & Certifications",
+    "Review & Submit"
+];
+
 export const MultiStepForm = () => {
     const [step, setStep] = useState(1);
+    const [complete, setComplete] = useState(false);
     const methods = useForm({
         mode: 'onBlur',
         defaultValues: {
-            fullName: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            birthDate: '',
-            streetAddress: '',
-            city: '',
-            zipCode: '',
-            marketingEmails: false,
-            notifications: true,
-            theme: 'dark'
+            locationType: 'single'
         }
     });
 
     const onSubmit = (data) => {
-        console.log('Form Submitted Payload:', data);
-        setStep(5); // Success step
+        console.log('Final Payload:', data);
+        setComplete(true);
     };
 
     const nextStep = async () => {
-        const isStepValid = await methods.trigger();
-        // In a real app, we'd validate only the current step's fields.
-        // For now, I'll validat all, but ideally we should scope triggers.
-        // Let's improve this:
-        let valid = false;
-        if (step === 1) valid = await methods.trigger(['fullName', 'email', 'password', 'confirmPassword']);
-        if (step === 2) valid = await methods.trigger(['streetAddress', 'city', 'zipCode', 'birthDate']);
-        if (step === 3) valid = true; // Preferences usually optional
-        if (step === 4) valid = true;
-
-        if (valid) setStep(prev => prev + 1);
+        // Basic validation trigger per step can be added here
+        setStep(prev => Math.min(prev + 1, 6));
     };
 
-    const prevStep = () => setStep(prev => prev - 1);
+    const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
     const getStepContent = (stepIndex) => {
         switch (stepIndex) {
-            case 1: return <Step1Personal />;
-            case 2: return <Step2Address />;
-            case 3: return <Step3Preferences />;
-            case 4: return <Step4Review goToStep={(s) => setStep(s)} />;
-            case 5: return <Success />;
-            default: return <Step1Personal />;
+            case 1: return <Step1Organization />;
+            case 2: return <Step2Facility />;
+            case 3: return <Step3Leadership />;
+            case 4: return <Step4SiteInfo />;
+            case 5: return <Step5Services />;
+            case 6: return <Step6Review goToStep={setStep} />;
+            default: return <Step1Organization />;
         }
     };
 
-    if (step === 5) {
-        return (
-            <div className="form-card">
-                <Success />
-            </div>
-        );
+    if (complete) {
+        return <Success />;
     }
 
     return (
-        <div className="form-card">
-            <div className="step-indicator">
-                {[1, 2, 3, 4].map(num => (
-                    <div
-                        key={num}
-                        className={`step-dot ${step === num ? 'active' : ''} ${step > num ? 'completed' : ''}`}
-                    />
-                ))}
+        <div className="form-wrapper">
+            <div className="form-header">
+                <h1 className="page-title">
+                    {step === 1 ? "New DNV Quote Request" : STEPS[step - 1]}
+                    <span className="step-counter">Step {step} of 6</span>
+                </h1>
+
+                <div className="progress-bar-container">
+                    {STEPS.map((label, index) => {
+                        const stepNum = index + 1;
+                        return (
+                            <div
+                                key={index}
+                                className={`progress-step ${step === stepNum ? 'active' : ''} ${step > stepNum ? 'completed' : ''}`}
+                            >
+                                {label}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
-            <FormProvider {...methods}>
-                <form onSubmit={methods.handleSubmit(onSubmit)}>
-                    {getStepContent(step)}
+            <div className="form-card">
+                <FormProvider {...methods}>
+                    <form onSubmit={methods.handleSubmit(onSubmit)}>
+                        {getStepContent(step)}
 
-                    <div className="button-group">
-                        {step > 1 && (
-                            <button type="button" className="btn btn-secondary" onClick={prevStep}>
-                                Back
-                            </button>
-                        )}
+                        <div className="form-actions">
+                            {/* Left Action: Exit or Previous */}
+                            {step === 1 ? (
+                                <button type="button" className="btn btn-exit">Exit</button>
+                            ) : (
+                                <button type="button" className="btn btn-outline" onClick={prevStep}>Previous</button>
+                            )}
 
-                        {step < 4 && (
-                            <button type="button" className="btn btn-primary" onClick={nextStep}>
-                                Next Step
-                            </button>
-                        )}
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <button type="button" className="btn btn-primary" style={{ opacity: 0.9 }}>Save</button>
 
-                        {step === 4 && (
-                            <button type="submit" className="btn btn-primary">
-                                Confirm & Submit
-                            </button>
-                        )}
-                    </div>
-                </form>
-            </FormProvider>
+                                {step < 6 ? (
+                                    <button type="button" className="btn btn-primary" onClick={nextStep}>Continue</button>
+                                ) : (
+                                    <button type="submit" className="btn btn-primary">Submit Request</button>
+                                )}
+                            </div>
+                        </div>
+                    </form>
+                </FormProvider>
+            </div>
         </div>
     );
 };

@@ -1,16 +1,19 @@
 :root {
-  --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --card-border: rgba(255, 255, 255, 0.1);
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --accent-color: #e94560;
-  --accent-hover: #ff6b81;
-  --input-bg: rgba(0, 0, 0, 0.2);
-  --input-border: rgba(255, 255, 255, 0.1);
-  --input-focus: #e94560;
+  --header-bg: #1f3a60;
+  /* Deep Blue from header */
+  --primary-blue: #0b5c9e;
+  /* Button blue */
+  --bg-color: #f8f9fa;
+  /* Light gray background */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #dee2e6;
+  --input-border: #ced4da;
+  --white: #ffffff;
+  --error-color: #dc3545;
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --transition-speed: 0.3s;
+  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --max-width: 1200px;
 }
 
 * {
@@ -21,17 +24,21 @@
 
 body {
   font-family: var(--font-family);
-  background: var(--bg-gradient);
-  background-attachment: fixed;
+  background: var(--bg-color);
   color: var(--text-primary);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  -webkit-font-smoothing: antialiased;
+  display: block;
+  /* Removed flex center to allow standard page flow */
 }
 
-button {
-  cursor: pointer;
+input,
+select,
+textarea {
   font-family: inherit;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
