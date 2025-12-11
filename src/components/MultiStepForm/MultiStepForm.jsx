@@ -86,8 +86,10 @@ export const MultiStepForm = () => {
 
                         <div className="form-actions">
                             {/* Left Action: Exit or Previous */}
-                            {step === 1 || (step === 4 && methods.watch("locationType")) ? (
+                            {step === 1 ? (
                                 <button type="button" className="btn btn-exit">Exit</button>
+                            ) : (step === 4 && methods.watch("locationType")) ? (
+                                <button type="button" className="btn btn-exit" onClick={prevStep}>Exit</button>
                             ) : (
                                 <button type="button" className="btn btn-outline" onClick={prevStep}>Previous</button>
                             )}
