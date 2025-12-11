@@ -16,34 +16,56 @@ const CheckboxGroup = ({ title, options, registerName, items }) => (
 );
 
 const DateChipInput = ({ label, name }) => {
-    // Mock functionality for date chips
     const [dates, setDates] = useState(['05/16/2025', '05/18/2025', '05/19/2025', '05/31/2025']);
+    const [inputValue, setInputValue] = useState('');
 
     const removeDate = (dateToRemove) => {
         setDates(dates.filter(d => d !== dateToRemove));
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && inputValue) {
+            e.preventDefault();
+            setDates([...dates, inputValue]);
+            setInputValue('');
+        }
     };
 
     return (
         <div className="form-group">
             <label className="form-label">{label}</label>
             <div style={{ position: 'relative' }}>
-                <input type="text" placeholder="mm/dd/yyyy" className="form-input" style={{ width: '100%' }} />
-                <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '1.2rem' }}>📅</span>
+                <input
+                    type="text"
+                    placeholder="mm/dd/yyyy"
+                    className="form-input"
+                    style={{ width: '100%' }}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                />
+                <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '1.2rem', cursor: 'pointer' }}>📅</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
-                {dates.map(date => (
-                    <div key={date} style={{
+                {dates.map((date, idx) => (
+                    <div key={idx} style={{
                         background: 'var(--primary-blue)',
                         color: 'white',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '5px'
+                        gap: '8px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                     }}>
                         {date}
-                        <span style={{ cursor: 'pointer', fontWeight: 'bold' }} onClick={() => removeDate(date)}>×</span>
+                        <span
+                            style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem', lineHeight: 0.5 }}
+                            onClick={() => removeDate(date)}
+                        >
+                            ×
+                        </span>
                     </div>
                 ))}
             </div>

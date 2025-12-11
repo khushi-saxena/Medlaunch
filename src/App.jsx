@@ -53,6 +53,9 @@ function App() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         fontWeight: 600
       }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 16.97 5.69 21.09 10.41 21.88V21.88C10.42 21.88 10.43 21.88 10.44 21.88H13.56C13.57 21.88 13.58 21.88 13.59 21.88C18.31 21.09 22 16.97 22 12C22 6.48 17.52 2 12 2ZM12 4C14.21 4 16 5.79 16 8C16 10.21 14.21 12 12 12C9.79 12 8 10.21 8 8C8 5.79 9.79 4 12 4ZM7.5 18C7.5 16.14 10.63 15 12 15C13.37 15 16.5 16.14 16.5 18H7.5Z" fill="white" />
+        </svg>
         <span>Support Chat</span>
       </button>
     </div>
