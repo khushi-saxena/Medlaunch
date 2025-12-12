@@ -1,7 +1,19 @@
 import { useFormContext } from 'react-hook-form';
+import { useState } from 'react';
 
 export const Step1Organization = () => {
-    const { register, formState: { errors } } = useFormContext();
+    const { register, formState: { errors }, getValues } = useFormContext();
+    const [verificationStatus, setVerificationStatus] = useState('Not verified');
+
+    const handleVerify = () => {
+        const email = getValues("email");
+        if (email) {
+            alert(`Verification email sent to: ${email}`);
+            setVerificationStatus('Verified');
+        } else {
+            alert('Please enter an email address first.');
+        }
+    };
 
     return (
         <div>
@@ -79,16 +91,28 @@ export const Step1Organization = () => {
                         pattern: { value: /^\S+@\S+$/, message: "Invalid email" }
                     })}
                     className="form-input"
+                    placeholder="example@email.com"
                 />
                 {errors.email && <span className="error-msg">{errors.email.message}</span>}
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <button type="button" className="btn btn-outline" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>
+                <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ fontSize: '0.85rem', padding: '8px 16px' }}
+                    onClick={handleVerify}
+                >
                     Send Verification Email
                 </button>
-                <span style={{ background: '#fff3cd', color: '#856404', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem' }}>
-                    Not verified
+                <span style={{
+                    background: verificationStatus === 'Verified' ? '#d4edda' : '#fff3cd',
+                    color: verificationStatus === 'Verified' ? '#155724' : '#856404',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem'
+                }}>
+                    {verificationStatus}
                 </span>
             </div>
         </div>

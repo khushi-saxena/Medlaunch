@@ -1,13 +1,44 @@
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useState } from 'react';
 
-const CheckboxGroup = ({ title, options, registerName, items }) => (
-    <div className="service-card">
-        <div style={{ fontWeight: 600, marginBottom: '15px' }}>{title}</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {items.map((item, idx) => (
-                <label key={idx} className="checkbox-label" style={{ fontSize: '0.9rem' }}>
-                    <input type="checkbox" value={item} {...registerName} />
+const CheckboxGroup = ({ title, options, registerName }) => (
+    <div className="service-card" style={{
+        border: '1px solid #e0e0e0',
+        borderRadius: '8px',
+        padding: '20px',
+        paddingBottom: '30px',
+        height: '100%',
+        background: 'white'
+    }}>
+        <div style={{
+            fontWeight: 700,
+            fontSize: '1rem',
+            marginBottom: '20px',
+            color: '#333'
+        }}>
+            {title}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {options.map((item, idx) => (
+                <label key={idx} className="checkbox-label" style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    fontSize: '0.95rem',
+                    color: '#333',
+                    cursor: 'pointer'
+                }}>
+                    <input
+                        type="checkbox"
+                        value={item}
+                        {...registerName}
+                        style={{
+                            marginTop: '3px',
+                            width: '18px',
+                            height: '18px',
+                            accentColor: 'var(--primary-blue)'
+                        }}
+                    />
                     {item}
                 </label>
             ))}
@@ -15,54 +46,52 @@ const CheckboxGroup = ({ title, options, registerName, items }) => (
     </div>
 );
 
-const DateChipInput = ({ label, name }) => {
-    const [dates, setDates] = useState(['05/16/2025', '05/18/2025', '05/19/2025', '05/31/2025']);
-    const [inputValue, setInputValue] = useState('');
+const DateChipInput = ({ label, value = [], onChange }) => {
+    const handleDateChange = (e) => {
+        if (e.target.value) {
+            // Format date from YYYY-MM-DD to MM/DD/YYYY for display/storage
+            const [y, m, d] = e.target.value.split('-');
+            const formattedDate = `${m}/${d}/${y}`;
 
-    const removeDate = (dateToRemove) => {
-        setDates(dates.filter(d => d !== dateToRemove));
+            // Prevent duplicates if desired, or just add
+            if (!value.includes(formattedDate)) {
+                onChange([...value, formattedDate]);
+            }
+            e.target.value = ''; // Reset input
+        }
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && inputValue) {
-            e.preventDefault();
-            setDates([...dates, inputValue]);
-            setInputValue('');
-        }
+    const removeDate = (dateToRemove) => {
+        onChange(value.filter(d => d !== dateToRemove));
     };
 
     return (
         <div className="form-group">
-            <label className="form-label">{label}</label>
-            <div style={{ position: 'relative' }}>
+            <label className="form-label" style={{ fontWeight: 700, marginBottom: '8px', display: 'block' }}>{label}</label>
+            <div style={{ position: 'relative', marginBottom: '10px' }}>
                 <input
-                    type="text"
-                    placeholder="mm/dd/yyyy"
+                    type="date"
                     className="form-input"
-                    style={{ width: '100%' }}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
+                    style={{ width: '100%', paddingRight: '40px' }}
+                    onChange={handleDateChange}
                 />
-                <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '1.2rem', cursor: 'pointer' }}>📅</span>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
-                {dates.map((date, idx) => (
-                    <div key={idx} style={{
-                        background: 'var(--primary-blue)',
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {value.map((date, i) => (
+                    <div key={i} style={{
+                        background: '#005a9c',
                         color: 'white',
-                        padding: '6px 14px',
+                        padding: '6px 12px',
                         borderRadius: '20px',
                         fontSize: '0.85rem',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        gap: '8px'
                     }}>
                         {date}
                         <span
-                            style={{ cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem', lineHeight: 0.5 }}
                             onClick={() => removeDate(date)}
+                            style={{ cursor: 'pointer', fontWeight: 'bold' }}
                         >
                             ×
                         </span>
@@ -70,11 +99,11 @@ const DateChipInput = ({ label, name }) => {
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export const Step5Services = () => {
-    const { register } = useFormContext();
+    const { register, watch, setValue } = useFormContext();
     const [activeTab, setActiveTab] = useState('All Services');
     const [showOther, setShowOther] = useState(false);
 
@@ -82,21 +111,31 @@ export const Step5Services = () => {
 
     return (
         <div>
-            <h2 className="form-section-title">Service Offering</h2>
-            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '20px' }}>Primary Site Service offering</p>
+            <h2 className="form-section-title" style={{ marginBottom: '10px' }}>Primary Contact Information</h2>
+            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '30px' }}>
+                Primary contact receives all DNV Healthcare official communications
+            </p>
 
             {/* Tabs */}
-            <div style={{ borderBottom: '1px solid #dee2e6', marginBottom: '20px', display: 'flex', gap: '20px' }}>
+            <div style={{
+                borderBottom: '1px solid #e0e0e0',
+                marginBottom: '25px',
+                display: 'flex',
+                gap: '30px',
+                overflowX: 'auto'
+            }}>
                 {tabs.map(tab => (
                     <div
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         style={{
-                            padding: '10px 0',
+                            padding: '12px 0',
                             cursor: 'pointer',
-                            color: activeTab === tab ? 'var(--primary-blue)' : '#666',
-                            borderBottom: activeTab === tab ? '2px solid var(--primary-blue)' : '2px solid transparent',
-                            fontWeight: activeTab === tab ? 600 : 400
+                            color: activeTab === tab ? '#0072CE' : '#555',
+                            borderBottom: activeTab === tab ? '3px solid #0072CE' : '3px solid transparent',
+                            fontWeight: activeTab === tab ? 600 : 400,
+                            fontSize: '0.95rem',
+                            whiteSpace: 'nowrap'
                         }}
                     >
                         {tab}
@@ -105,93 +144,222 @@ export const Step5Services = () => {
             </div>
 
             {/* Search */}
-            <div style={{ marginBottom: '20px' }}>
-                <input className="form-input" placeholder="Search services..." style={{ width: '100%' }} />
+            <div style={{ marginBottom: '30px', position: 'relative' }}>
+                <input
+                    className="form-input"
+                    placeholder="Search services..."
+                    style={{
+                        width: '100%',
+                        padding: '12px 15px',
+                        paddingRight: '40px', // Space for icon
+                        fontSize: '1rem',
+                        borderColor: '#e0e0e0'
+                    }}
+                />
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#999"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                        position: 'absolute',
+                        right: '15px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        pointerEvents: 'none'
+                    }}
+                >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
             </div>
 
             {/* Services Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '20px'
+            }}>
                 <CheckboxGroup
                     title="Emergency & Critical Care"
                     registerName={register("services.emergency")}
-                    items={['Emergency Department', 'Neonatal Intensive Care Services', 'Pediatric Intensive Care Services', 'Pediatric Intensive Care Services']} // Duplicate in screenshot?
+                    options={[
+                        'Emergency Department',
+                        'Neonatal Intensive Care Services',
+                        'Pediatric Intensive Care Services'
+                    ]}
                 />
 
                 <CheckboxGroup
                     title="Cardiac Services"
                     registerName={register("services.cardiac")}
-                    items={['Cardiac Catheterization Laboratory', 'Open Heart']}
+                    options={[
+                        'Cardiac Catheterization Laboratory',
+                        'Open Heart'
+                    ]}
                 />
 
                 <CheckboxGroup
                     title="Diagnostic Services"
                     registerName={register("services.diagnostic")}
-                    items={['Magnetic Resonance Imaging (MRI)', 'Diagnostic Radioisotope Facility', 'Lithotripsy']}
+                    options={[
+                        'Magnetic Resonance Imaging (MRI)',
+                        'Diagnostic Radioisotope Facility',
+                        'Lithotripsy'
+                    ]}
                 />
 
                 <CheckboxGroup
                     title="Rehabilitation Services"
                     registerName={register("services.rehab")}
-                    items={['Physical Rehabilitation Services', 'Physical Therapy', 'Occupational Therapy', 'Speech/Language Therapy', 'Audiology']}
+                    options={[
+                        'Physical Rehabilitation Services',
+                        'Physical Therapy',
+                        'Occupational Therapy',
+                        'Speech/Language Therapy',
+                        'Audiology'
+                    ]}
                 />
             </div>
 
-            {/* Add Other Service */}
-            <div style={{ marginTop: '20px' }}>
-                {!showOther ? (
-                    <button type="button" className="btn btn-outline" onClick={() => setShowOther(true)}>
-                        + Add Other Service
-                    </button>
-                ) : (
-                    <div style={{ border: '1px solid #dee2e6', padding: '15px', borderRadius: '8px' }}>
-                        <div style={{ fontWeight: 600, marginBottom: '10px' }}>Other Service</div>
-                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <input className="form-input" placeholder="Specify other service" style={{ flex: 1 }} />
-                            <button type="button" onClick={() => setShowOther(false)} style={{ border: 'none', background: 'none', color: 'red', fontSize: '1.2rem', cursor: 'pointer' }}>×</button>
+            {/* Other Service Section */}
+            <div style={{ marginTop: '30px' }}>
+                <button
+                    type="button"
+                    onClick={() => setShowOther(true)}
+                    style={{
+                        background: 'white',
+                        color: '#0072CE',
+                        border: '1px solid #0072CE',
+                        padding: '10px 20px',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontSize: '0.95rem'
+                    }}
+                >
+                    + Add Other Service
+                </button>
+
+                {showOther && (
+                    <div style={{
+                        marginTop: '20px',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        padding: '24px',
+                        background: 'white',
+                        position: 'relative'
+                    }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 16px 0', color: '#333' }}>
+                            Other Service
+                        </h3>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                            <input
+                                {...register("services.other")}
+                                className="form-input"
+                                placeholder="Specify other service"
+                                style={{
+                                    flex: 1,
+                                    borderColor: '#e0e0e0',
+                                    padding: '12px',
+                                    borderRadius: '4px'
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowOther(false)}
+                                style={{
+                                    border: 'none',
+                                    background: 'none',
+                                    color: '#dc3545',
+                                    fontSize: '1.5rem',
+                                    cursor: 'pointer',
+                                    padding: '0 10px',
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <span style={{ fontSize: '24px', lineHeight: '24px' }}>×</span>
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
 
             {/* Standards Section */}
-            <h2 className="form-section-title" style={{ marginTop: '40px' }}>Standards to Apply</h2>
-            <div className="form-group">
-                <select className="form-input">
-                    <option>Select Standard(s)</option>
-                    <option>Action1</option>
-                </select>
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <span style={{
-                        border: '1px solid var(--primary-blue)',
-                        color: 'var(--primary-blue)',
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '0.85rem'
-                    }}>Action1 ×</span>
-                    <span style={{
-                        border: '1px solid var(--primary-blue)',
-                        color: 'var(--primary-blue)',
-                        padding: '4px 12px',
-                        borderRadius: '15px',
-                        fontSize: '0.85rem'
-                    }}>Action2 ×</span>
+            <div style={{ marginTop: '40px' }}>
+                <h3 className="form-section-title" style={{ fontSize: '1.25rem', marginBottom: '20px' }}>Standards to Apply</h3>
+
+                <div className="form-group" style={{ marginBottom: '30px' }}>
+                    <select className="form-input" style={{ width: '100%', padding: '12px', color: '#666' }}>
+                        <option>Select Standard(s)</option>
+                        <option>Action1</option>
+                        <option>Action2</option>
+                    </select>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+                        {['Action1', 'Action2'].map(action => (
+                            <span key={action} style={{
+                                border: '1px solid var(--primary-blue)',
+                                color: 'var(--primary-blue)',
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                background: 'white'
+                            }}>
+                                {action}
+                                <span style={{ cursor: 'pointer', fontSize: '1.1rem', lineHeight: 0.5 }}>×</span>
+                            </span>
+                        ))}
+                    </div>
                 </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
+                    <div className="form-group">
+                        <label className="form-label" style={{ fontWeight: 700, marginBottom: '8px', display: 'block' }}>Expiration Date of Current Stroke Certification</label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="date"
+                                {...register("services.strokeExpirationDate")}
+                                className="form-input"
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <label className="form-label" style={{ fontWeight: 700, marginBottom: '8px', display: 'block' }}>Date of Application</label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type="date"
+                                {...register("services.dateOfApplication")}
+                                className="form-input"
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <DateChipInput
+                    label="Dates of last twenty-five thrombolytic administrations"
+                    value={watch("services.thromboDates") || []}
+                    onChange={(val) => setValue("services.thromboDates", val)}
+                />
+                <div style={{ height: '20px' }}></div>
+                <DateChipInput
+                    label="Dates of last fifteen thrombectomies"
+                    value={watch("services.thrombecDates") || []}
+                    onChange={(val) => setValue("services.thrombecDates", val)}
+                />
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                <div className="form-group">
-                    <label className="form-label">Expiration Date of Current Stroke Certification</label>
-                    <input type="date" className="form-input" />
-                </div>
-                <div className="form-group">
-                    <label className="form-label">Date of Application</label>
-                    <input type="date" className="form-input" />
-                </div>
-            </div>
-
-            <DateChipInput label="Dates of last twenty-five thrombolytic administrations" name="thrombolytic" />
-            <DateChipInput label="Dates of last fifteen thrombectomies" name="thrombectomy" />
-
         </div>
     );
 };

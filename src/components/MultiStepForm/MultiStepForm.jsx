@@ -79,34 +79,34 @@ export const MultiStepForm = () => {
                 </div>
             </div>
 
-            <div className="form-card">
-                <FormProvider {...methods}>
-                    <form onSubmit={methods.handleSubmit(onSubmit)}>
+            <FormProvider {...methods}>
+                <form onSubmit={methods.handleSubmit(onSubmit)}>
+                    <div className="form-card">
                         {getStepContent(step)}
+                    </div>
 
-                        <div className="form-actions">
-                            {/* Left Action: Exit or Previous */}
-                            {step === 1 ? (
-                                <button type="button" className="btn btn-exit">Exit</button>
-                            ) : (step === 4 && methods.watch("locationType")) ? (
-                                <button type="button" className="btn btn-exit" onClick={prevStep}>Exit</button>
+                    <div className="form-actions">
+                        {/* Left Action: Exit or Previous */}
+                        {step === 1 ? (
+                            <button type="button" className="btn btn-exit">Exit</button>
+                        ) : step === 4 ? (
+                            <button type="button" className="btn btn-exit" onClick={prevStep}>Exit</button>
+                        ) : (
+                            <button type="button" className="btn btn-outline" onClick={prevStep}>Previous</button>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '15px' }}>
+                            <button type="button" className="btn btn-primary" style={{ opacity: 0.9 }}>Save</button>
+
+                            {step < 6 ? (
+                                <button type="button" className="btn btn-primary" onClick={nextStep}>Continue</button>
                             ) : (
-                                <button type="button" className="btn btn-outline" onClick={prevStep}>Previous</button>
+                                <button type="submit" className="btn btn-primary">Submit Request</button>
                             )}
-
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <button type="button" className="btn btn-primary" style={{ opacity: 0.9 }}>Save</button>
-
-                                {step < 6 ? (
-                                    <button type="button" className="btn btn-primary" onClick={nextStep}>Continue</button>
-                                ) : (
-                                    <button type="submit" className="btn btn-primary">Submit Request</button>
-                                )}
-                            </div>
                         </div>
-                    </form>
-                </FormProvider>
-            </div>
+                    </div>
+                </form>
+            </FormProvider>
         </div>
     );
 };
